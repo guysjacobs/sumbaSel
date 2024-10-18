@@ -1,0 +1,407 @@
+---
+title: "Coalescent model of inland vs coastal allele frequencies for G6PD"
+output: html_document
+date: "2024-08-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(coala)
+library(ggplot2)
+library(magrittr)
+library(dplyr)
+library(viridis)
+library(cowplot)
+```
+
+# Construct Model 1: 1.5% migration 
+
+```{r}
+create_model <- function(population_size) {
+  model_to_run <- coal_model(sample_size=c(0,105,104,104,104,107,107,107,106),loci_number=1000, loci_length=16000)+
+    
+    feat_mutation(rate=1.25e-8*4*10000*16000) +
+    feat_recombination(rate=1.0e-8*4*10000*16000) + 
+    #Rate = locus_length * per_generation_per_base_pair_mutation_rate * 4 * Ne
+    
+    feat_size_change(((population_size)/10000), p="all", time=1/40000) + 
+    #Set village pop sizes
+    
+    feat_size_change((800/10000), p=1, time=1/40000) +                
+    #Pop. 1: 'Melanesian' ancestry
+    feat_migration(rate=0.015*4*10000,symmetric=TRUE,time=1/40000) + #Set migration rate
+    
+    feat_migration(0,pop_from=2,pop_to=1,time=1/40000) + #Immediately remove migration from others to Pop 1 
+    feat_migration(0,pop_from=3,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=4,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=5,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=6,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=7,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=8,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=9,pop_to=1,time=1/40000) +
+    
+    feat_migration(0,pop_from=1,pop_to=2,time=1/40000) + #Immediately remove migration from Pop 1 to others 
+    feat_migration(0,pop_from=1,pop_to=3,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=4,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=5,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=6,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=7,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=8,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=9,time=1/40000) +
+    
+    feat_pop_merge(time=161/40000,pop_source=3, pop_target = 2) +  #merge all villages into pop 2 at 160 gens
+    feat_pop_merge(time=161/40000,pop_source=4, pop_target = 2) +
+    feat_pop_merge(time=161/40000,pop_source=5, pop_target = 2) +
+    feat_pop_merge(time=161/40000,pop_source=6, pop_target = 2) +
+    feat_pop_merge(time=161/40000,pop_source=7, pop_target = 2) +
+    feat_pop_merge(time=161/40000,pop_source=8, pop_target = 2) +
+    feat_pop_merge(time=161/40000,pop_source=9, pop_target = 2) +
+    
+    feat_size_change(((1425/10000)), population=2, time=161/40000) + #Change pop 2 size at 160 gens
+    
+    feat_migration(rate=0.26*4*10000, pop_from=1,pop_to =2,time = 162/40000) +  #pop 2 receives 26% from 'Melanesian' pop 1
+    feat_migration(rate=0.0,pop_from=1,pop_to=2, time = 163/40000) +
+    #^^ pulse of admixture from pop 1 to 2
+    
+    feat_size_change((2050/10000), population=2, time=164/40000) +
+    
+    feat_pop_merge(time=2002/40000, pop_source=2,pop_target=1) +                #Merge pop 2 into 1 at 2000 gens
+    feat_size_change((10500/10000), 1, time = 2002/40000) +                #ancestral pop. size at 2002 gens
+ 
+    sumstat_seg_sites(name = "freq_inland", transformation = inland_segsites_freq) +
+    sumstat_seg_sites(name = "freq_coastal", transformation = coastal_segsites_freq)
+    
+  return(simulate(model_to_run))
+}
+```
+
+```{r}
+# Transformation functions
+    inland_segsites_freq <- function(x) {
+    lapply(lapply(lapply(lapply(x, as.matrix), head, 417), colSums), function(x) x/417)
+    }
+    
+    coastal_segsites_freq <- function(x) {
+    lapply(lapply(lapply(lapply(x, as.matrix), tail, 427), colSums), function(x) x/427)
+    }
+```
+
+
+```{r}
+#Population sizes 
+population_size <- data.frame(Size = c(seq(from = 100, to = 1500, by = 50), 1658, 179))
+```
+
+#Run model 1
+
+```{r}
+res_model1=apply(X=population_size, FUN = create_model, MARGIN=1)
+```
+
+# Construct Model 2: 2.5% migration
+
+```{r}
+
+create_model2 <- function(population_size) {
+  model_to_run <- coal_model(sample_size=c(0,105,104,104,104,107,107,107,106),loci_number=1000, loci_length=16000)+
+    
+    feat_mutation(rate=1.25e-8*4*10000*16000) +
+    feat_recombination(rate=1.0e-8*4*10000*16000) + 
+    #Rate=locus_length * per_generation_per_base_pair_mutation_rate * 4 * Ne
+    
+    feat_size_change(((population_size)/10000), p="all", time=1/40000) + 
+    #Set village pop sizes
+    
+    feat_size_change((800/10000), p=1, time=1/40000) +                
+    #Pop. 1: 'Melanesian' ancestry
+    feat_migration(rate=0.025*4*10000,symmetric=TRUE,time=1/40000) +      #Set migration rate
+    
+    feat_migration(0,pop_from=2,pop_to=1,time=1/40000) + #Immediately remove migration from others to Pop 1 
+    feat_migration(0,pop_from=3,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=4,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=5,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=6,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=7,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=8,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=9,pop_to=1,time=1/40000) +
+    
+    feat_migration(0,pop_from=1,pop_to=2,time=1/40000) + #Immediately remove migration from Pop 1 to others 
+    feat_migration(0,pop_from=1,pop_to=3,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=4,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=5,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=6,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=7,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=8,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=9,time=1/40000) +
+    
+    feat_pop_merge(time=161/40000,pop_source=3, pop_target = 2) +  #merge all villages into pop 2 at 160 gens
+    feat_pop_merge(time=161/40000,pop_source=4, pop_target = 2) +
+    feat_pop_merge(time=161/40000,pop_source=5, pop_target = 2) +
+    feat_pop_merge(time=161/40000,pop_source=6, pop_target = 2) +
+    feat_pop_merge(time=161/40000,pop_source=7, pop_target = 2) +
+    feat_pop_merge(time=161/40000,pop_source=8, pop_target = 2) +
+    feat_pop_merge(time=161/40000,pop_source=9, pop_target = 2) +
+    
+    feat_size_change(((1425/10000)), population=2, time=161/40000) + #Change pop 2 size at 160 gens
+    
+    feat_migration(rate=0.26*4*10000, pop_from=1,pop_to =2,time = 162/40000) +  #pop 2 receives 26% from 'Melanesian' pop 1
+    feat_migration(rate=0.0,pop_from=1,pop_to=2, time = 163/40000) +
+    #^^ pulse of admixture from pop 1 to 2
+    
+    feat_size_change((2050/10000), population=2, time=164/40000) +
+    
+    feat_pop_merge(time=2002/40000, pop_source=2,pop_target=1) +                #Merge pop 2 into 1 at 2000 gens
+    feat_size_change((10500/10000), 1, time = 2002/40000) +                #ancestral pop. size at 2002 gens
+
+    sumstat_seg_sites(name = "freq_inland", transformation = inland_segsites_freq) +
+    sumstat_seg_sites(name = "freq_coastal", transformation = coastal_segsites_freq)
+    
+  return(simulate(model_to_run))
+}
+```
+
+
+```{r}
+#Run model 2
+res_model2=apply(X=population_size, FUN = create_model2, MARGIN=1)
+```
+
+
+
+# 1.5% model 
+
+```{r}
+# Here, sites are filtered based on findings of Satyagraha et al. 2015
+# to those with inland_freq > 0.02 & < 0.05, coastal allele frequencies
+# for these sites are stored, and the 95th percentile is calculated.
+
+percentile_95_coastal_filtered <- numeric(length(res_model1))
+
+for (run_idx in seq_along(res_model1)) {
+  
+  # Extract freq_inland and freq_coastal for the current run
+  coastal_freq <- res_model1[[run_idx]]$freq_coastal
+  inland_freq <- res_model1[[run_idx]]$freq_inland
+  
+  filtered_coastal_freq_all <- numeric(0)
+  
+  for (i in seq_along(inland_freq)) {
+    # Get inland and coastal allele frequencies for the current locus
+    inland_locus <- inland_freq[[i]]
+    coastal_locus <- coastal_freq[[i]]
+    
+    # Filter inland frequencies to keep those between 2% and 5%
+    filter_indices <- which(inland_locus >= 0.02 & inland_locus <= 0.05)
+    filtered_coastal_freq <- coastal_locus[filter_indices]
+    filtered_coastal_freq_all <- c(filtered_coastal_freq_all, filtered_coastal_freq)
+  }
+  
+  # calculate 95th percentile for for this population size run
+  if (length(filtered_coastal_freq_all) > 0) {
+    percentile_95_coastal_filtered[run_idx] <- quantile(filtered_coastal_freq_all, 0.95, na.rm = TRUE)
+  } else {
+    percentile_95_coastal_filtered[run_idx] <- NA  
+  }
+}
+
+
+res_model1_freq <- data.frame(size = population_size$Size, 
+                                 freq_95 = percentile_95_coastal_filtered)
+
+
+```
+
+# 2.5% model
+
+```{r}
+# Here, sites are filtered based on findings of Satyagraha et al. 2015
+# to those with inland_freq > 0.02 & < 0.05, coastal allele frequencies
+# for these sites are stored, and the 95th percentile is calculated.
+
+percentile_95_coastal_filtered <- numeric(length(res_model2))
+
+for (run_idx in seq_along(res_model2)) {
+  
+  # Extract freq_inland and freq_coastal for the current run
+  coastal_freq <- res_model2[[run_idx]]$freq_coastal
+  inland_freq <- res_model2[[run_idx]]$freq_inland
+
+  filtered_coastal_freq_all <- numeric(0)
+  
+  for (i in seq_along(inland_freq)) {
+    inland_locus <- inland_freq[[i]]
+    coastal_locus <- coastal_freq[[i]]
+    
+    # Filter inland frequencies to keep those between 2% and 5%
+    filter_indices <- which(inland_locus >= 0.02 & inland_locus <= 0.05)
+    filtered_coastal_freq <- coastal_locus[filter_indices]
+    filtered_coastal_freq_all <- c(filtered_coastal_freq_all, filtered_coastal_freq)
+  }
+  
+  # calcualte 95th percentile for this population size run
+  if (length(filtered_coastal_freq_all) > 0) {
+    percentile_95_coastal_filtered[run_idx] <- quantile(filtered_coastal_freq_all, 0.95, na.rm = TRUE)
+  } else {
+    percentile_95_coastal_filtered[run_idx] <- NA  
+  }
+}
+
+
+res_model2_freq <- data.frame(size = population_size$Size, 
+                                 freq_95 = percentile_95_coastal_filtered)
+
+```
+
+# Plot of 95th percentile against population size: Manuscript Fig2
+
+```{r}
+
+res_model1_freq$type <- "1.5%"
+res_model2_freq$type <- "5.5%"
+
+
+res_model1_freq$point_color <- ifelse(res_model1_freq$size == 1658, "Lansing et al. 2011",
+                                  ifelse(res_model1_freq$size == 179, "Cox et al. 2016", "Simulated"))
+
+res_model2_freq$point_color <- ifelse(res_model2_freq$size == 1658, "Lansing et al. 2011",
+                                  ifelse(res_model2_freq$size == 179, "Cox et al. 2016", "Simulated"))
+
+
+ggplot() +
+  
+  geom_point(data = res_model1_freq, aes(x = size, y = freq_95, color = point_color, shape = type)) +  
+      # Vertical lines
+  geom_vline(xintercept = 1658, linetype = "dotted", colour = "black", linewidth = 0.8) + 
+  geom_vline(xintercept = 179, linetype = "dotted", color = "black", linewidth = 0.8) +
+  geom_vline(xintercept = 1240, linetype = "dotted", colour = "black", linewidth = 0.8) +  
+  
+  geom_smooth(data = res_model1_freq, aes(x = size, y = freq_95, linetype = type), method = "loess", se = FALSE, color = "darkgrey", size = 0.8) + 
+  geom_hline(yintercept = 0.105, colour = "red", linetype = "dashed") +  
+
+  geom_point(data = res_model2_freq, aes(x = size, y = freq_95, color = point_color, shape = type)) +  
+  geom_smooth(data = res_model2_freq, aes(x = size, y = freq_95, linetype = type), method = "loess", se = FALSE, color = "darkgrey", size = 0.8) +
+  
+  
+  scale_color_manual(values = c("Lansing et al. 2011" = "#009E73", "Cox et al. 2016" = "blue", "Simulated" = "red")) +  
+  scale_shape_manual(values = c("5.5%" = 17, "1.5%" = 16)) + 
+  scale_linetype_manual(values = c("5.5%" = "solid", "1.5%" = "dashed")) +  
+  scale_x_continuous(limits = c(0, NA)) +
+  theme_classic() +
+  labs(x = "Village Effective Population Size", 
+       y = "Simulated Coastal Allele Frequency (95th Percentile)", 
+       color = "Ne Estimate", 
+       shape = "Migration Rate", 
+       linetype = "Migration Rate") +
+  
+  guides(
+    shape = guide_legend(
+      override.aes = list(color = "darkgrey", linetype = "solid", size = 2)
+    ),
+    linetype = guide_legend(
+      override.aes = list(color = "darkgrey", shape = c(16, 17))
+    ),
+    color = guide_legend(order = 2)
+  )+
+    theme(
+    panel.border = element_rect(color = "black", fill = NA, size = 1), 
+    axis.line = element_blank() 
+  )
+
+```
+
+
+# Site-frequency-spectrum plots
+
+
+```{r}
+percentile_95_coastal_filtered <- numeric(length(res_model1))
+
+for (run_idx in seq_along(res_model1)) {
+
+  coastal_freq <- res_model1[[run_idx]]$freq_coastal
+  inland_freq <- res_model1[[run_idx]]$freq_inland
+  filtered_coastal_freq_all <- numeric(0)
+  
+  for (i in seq_along(inland_freq)) {
+
+    inland_locus <- inland_freq[[i]]
+    coastal_locus <- coastal_freq[[i]]
+    
+    # Filter inland frequencies to keep those between 2% and 5%
+    filter_indices <- which(inland_locus >= 0.02 & inland_locus <= 0.05)
+    
+    filtered_coastal_freq <- coastal_locus[filter_indices]
+
+    filtered_coastal_freq_all <- c(filtered_coastal_freq_all, filtered_coastal_freq)
+  }
+
+}
+
+
+plt1 <- ggplot(data.frame(freq = filtered_coastal_freq_all), aes(x = freq)) +
+  geom_histogram(binwidth = 0.01, fill = viridis(1, begin = 0.5, end = 0.5), color = NA) +
+  labs(x = "Coastal derived allele frequency (migration rate 1.5%)",
+       y = "SNP Count") +
+  geom_vline(xintercept = 0.15, linetype = "dashed", color = "red", size = 0.8) +
+  annotate("rect", xmin = 0.15, xmax = Inf, ymin = 0, ymax = Inf,
+           alpha = .1,fill = "red")+
+  theme(
+    panel.border = element_rect(color = "black", fill = NA, size = 1), 
+    axis.line = element_blank(), 
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white"), 
+    plot.background = element_rect(fill = "white")
+  )
+
+```
+
+
+```{r}
+percentile_95_coastal_filtered <- numeric(length(res_model2))
+
+for (run_idx in seq_along(res_model2)) {
+
+  coastal_freq <- res_model2[[run_idx]]$freq_coastal
+  inland_freq <- res_model2[[run_idx]]$freq_inland
+  filtered_coastal_freq_all <- numeric(0)
+  
+  for (i in seq_along(inland_freq)) {
+    inland_locus <- inland_freq[[i]]
+    coastal_locus <- coastal_freq[[i]]
+    
+    # Filter inland frequencies to keep those between 2% and 5%
+    filter_indices <- which(inland_locus >= 0.02 & inland_locus <= 0.05)
+    filtered_coastal_freq <- coastal_locus[filter_indices]
+
+    filtered_coastal_freq_all <- c(filtered_coastal_freq_all, filtered_coastal_freq)
+  }
+
+}
+
+
+plt2 <- ggplot(data.frame(freq = filtered_coastal_freq_all), aes(x = freq)) +
+  geom_histogram(binwidth = 0.01, fill = viridis(1, begin = 0.5, end = 0.5), color = NA) + 
+  labs(x = "Coastal derived allele frequency (migration rate 2.5%)",
+       y = "SNP Count") +
+  geom_vline(xintercept = 0.15, linetype = "dashed", color = "red", size = 0.8) +
+  annotate("rect", xmin = 0.15, xmax = Inf, ymin = 0, ymax = Inf,
+           alpha = .1,fill = "red")+
+  theme(
+    panel.border = element_rect(color = "black", fill = NA, size = 1), 
+    axis.line = element_blank(), 
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white"), 
+    plot.background = element_rect(fill = "white")
+  )
+
+```
+
+
+# Plot of coastal derived allele frequency
+
+```{r}
+combined_plot <- plot_grid(plt1, plt2, nrow = 2)
+print(combined_plot)
+```
