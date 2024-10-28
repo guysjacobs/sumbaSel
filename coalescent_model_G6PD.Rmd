@@ -24,49 +24,49 @@ create_model <- function(population_size) {
     feat_recombination(rate=1.0e-8*4*10000*16000) + 
     #Rate = locus_length * per_generation_per_base_pair_mutation_rate * 4 * Ne
     
-    feat_size_change(((population_size)/10000), p="all", time=1/40000) + 
+    feat_size_change(((population_size)/10000) * 0.75, p="all", time=0/40000) + 
     #Set village pop sizes
     
-    feat_size_change((800/10000), p=1, time=1/40000) +                
+    feat_size_change((800/10000) * 0.75, p=1, time=0/40000) +                
     #Pop. 1: 'Melanesian' ancestry
-    feat_migration(rate=0.015*4*10000,symmetric=TRUE,time=1/40000) + #Set migration rate
+    feat_migration(rate=0.015*4*10000,symmetric=TRUE,time=0/40000) + #Set migration rate
     
-    feat_migration(0,pop_from=2,pop_to=1,time=1/40000) + #Immediately remove migration from others to Pop 1 
-    feat_migration(0,pop_from=3,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=4,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=5,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=6,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=7,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=8,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=9,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=2,pop_to=1,time=0.001/40000) + #Immediately remove migration from others to Pop 1 
+    feat_migration(0,pop_from=3,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=4,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=5,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=6,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=7,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=8,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=9,pop_to=1,time=0.001/40000) +
     
-    feat_migration(0,pop_from=1,pop_to=2,time=1/40000) + #Immediately remove migration from Pop 1 to others 
-    feat_migration(0,pop_from=1,pop_to=3,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=4,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=5,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=6,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=7,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=8,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=9,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=2,time=0.001/40000) + #Immediately remove migration from Pop 1 to others 
+    feat_migration(0,pop_from=1,pop_to=3,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=4,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=5,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=6,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=7,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=8,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=9,time=0.001/40000) +
     
-    feat_pop_merge(time=161/40000,pop_source=3, pop_target = 2) +  #merge all villages into pop 2 at 160 gens
-    feat_pop_merge(time=161/40000,pop_source=4, pop_target = 2) +
-    feat_pop_merge(time=161/40000,pop_source=5, pop_target = 2) +
-    feat_pop_merge(time=161/40000,pop_source=6, pop_target = 2) +
-    feat_pop_merge(time=161/40000,pop_source=7, pop_target = 2) +
-    feat_pop_merge(time=161/40000,pop_source=8, pop_target = 2) +
-    feat_pop_merge(time=161/40000,pop_source=9, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=3, pop_target = 2) +  #merge all villages into pop 2 at 162 gens
+    feat_pop_merge(time=162/40000,pop_source=4, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=5, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=6, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=7, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=8, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=9, pop_target = 2) +
     
-    feat_size_change(((1425/10000)), population=2, time=161/40000) + #Change pop 2 size at 160 gens
+    feat_size_change(((1425/10000)) * 0.75, population=2, time=162/40000) + #Change pop 2 size at 162 gens
     
-    feat_migration(rate=0.26*4*10000, pop_from=1,pop_to =2,time = 162/40000) +  #pop 2 receives 26% from 'Melanesian' pop 1
-    feat_migration(rate=0.0,pop_from=1,pop_to=2, time = 163/40000) +
+    feat_migration(rate=0.26*4*10000, pop_from=1, pop_to =2, time = 163/40000) +  #pop 2 receives 26% from 'Melanesian' pop 1
+    feat_migration(rate=0.0, pop_from=1, pop_to=2, time = 164/40000) +
     #^^ pulse of admixture from pop 1 to 2
     
-    feat_size_change((2050/10000), population=2, time=164/40000) +
+    feat_size_change((2050/10000) * 0.75, population=2, time=164.001/40000) +   #E Asian pop size for those lineages that didn't move to 'Melanesian' pop 1
     
-    feat_pop_merge(time=2002/40000, pop_source=2,pop_target=1) +                #Merge pop 2 into 1 at 2000 gens
-    feat_size_change((10500/10000), 1, time = 2002/40000) +                #ancestral pop. size at 2002 gens
+    feat_pop_merge(time=2000/40000, pop_source=2, pop_target=1) +                #Merge pop 2 into 1 at 2000 gens
+    feat_size_change((10500/10000) * 0.75, 1, time = 2000.001/40000) +                #ancestral pop. size
  
     sumstat_seg_sites(name = "freq_inland", transformation = inland_segsites_freq) +
     sumstat_seg_sites(name = "freq_coastal", transformation = coastal_segsites_freq)
@@ -98,7 +98,7 @@ population_size <- data.frame(Size = c(seq(from = 100, to = 1500, by = 50), 1658
 res_model1=apply(X=population_size, FUN = create_model, MARGIN=1)
 ```
 
-# Construct Model 2: 2.5% migration
+# Construct Model 2: 5.5% migration
 
 ```{r}
 
@@ -109,49 +109,49 @@ create_model2 <- function(population_size) {
     feat_recombination(rate=1.0e-8*4*10000*16000) + 
     #Rate=locus_length * per_generation_per_base_pair_mutation_rate * 4 * Ne
     
-    feat_size_change(((population_size)/10000), p="all", time=1/40000) + 
+    feat_size_change(((population_size)/10000) * 0.75, p="all", time=0/40000) + 
     #Set village pop sizes
     
-    feat_size_change((800/10000), p=1, time=1/40000) +                
+    feat_size_change((800/10000) * 0.75, p=1, time=0/40000) +                
     #Pop. 1: 'Melanesian' ancestry
-    feat_migration(rate=0.025*4*10000,symmetric=TRUE,time=1/40000) +      #Set migration rate
+    feat_migration(rate=0.055*4*10000,symmetric=TRUE,time=0/40000) +      #Set migration rate
     
-    feat_migration(0,pop_from=2,pop_to=1,time=1/40000) + #Immediately remove migration from others to Pop 1 
-    feat_migration(0,pop_from=3,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=4,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=5,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=6,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=7,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=8,pop_to=1,time=1/40000) +
-    feat_migration(0,pop_from=9,pop_to=1,time=1/40000) +
+    feat_migration(0,pop_from=2,pop_to=1,time=0.001/40000) + #Immediately remove migration from others to Pop 1 
+    feat_migration(0,pop_from=3,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=4,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=5,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=6,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=7,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=8,pop_to=1,time=0.001/40000) +
+    feat_migration(0,pop_from=9,pop_to=1,time=0.001/40000) +
     
-    feat_migration(0,pop_from=1,pop_to=2,time=1/40000) + #Immediately remove migration from Pop 1 to others 
-    feat_migration(0,pop_from=1,pop_to=3,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=4,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=5,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=6,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=7,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=8,time=1/40000) +
-    feat_migration(0,pop_from=1,pop_to=9,time=1/40000) +
+    feat_migration(0,pop_from=1,pop_to=2,time=0.001/40000) + #Immediately remove migration from Pop 1 to others 
+    feat_migration(0,pop_from=1,pop_to=3,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=4,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=5,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=6,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=7,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=8,time=0.001/40000) +
+    feat_migration(0,pop_from=1,pop_to=9,time=0.001/40000) +
     
-    feat_pop_merge(time=161/40000,pop_source=3, pop_target = 2) +  #merge all villages into pop 2 at 160 gens
-    feat_pop_merge(time=161/40000,pop_source=4, pop_target = 2) +
-    feat_pop_merge(time=161/40000,pop_source=5, pop_target = 2) +
-    feat_pop_merge(time=161/40000,pop_source=6, pop_target = 2) +
-    feat_pop_merge(time=161/40000,pop_source=7, pop_target = 2) +
-    feat_pop_merge(time=161/40000,pop_source=8, pop_target = 2) +
-    feat_pop_merge(time=161/40000,pop_source=9, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=3, pop_target = 2) +  #merge all villages into pop 2 at 160 gens
+    feat_pop_merge(time=162/40000,pop_source=4, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=5, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=6, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=7, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=8, pop_target = 2) +
+    feat_pop_merge(time=162/40000,pop_source=9, pop_target = 2) +
     
-    feat_size_change(((1425/10000)), population=2, time=161/40000) + #Change pop 2 size at 160 gens
+    feat_size_change(((1425/10000)) * 0.75, population=2, time=162/40000) + #Change pop 2 size at 160 gens
     
-    feat_migration(rate=0.26*4*10000, pop_from=1,pop_to =2,time = 162/40000) +  #pop 2 receives 26% from 'Melanesian' pop 1
-    feat_migration(rate=0.0,pop_from=1,pop_to=2, time = 163/40000) +
+    feat_migration(rate=0.26*4*10000, pop_from=1,pop_to =2,time = 163/40000) +  #pop 2 receives 26% from 'Melanesian' pop 1
+    feat_migration(rate=0.0,pop_from=1,pop_to=2, time = 164/40000) +
     #^^ pulse of admixture from pop 1 to 2
     
-    feat_size_change((2050/10000), population=2, time=164/40000) +
+    feat_size_change((2050/10000) * 0.75, population=2, time=164.001/40000) +    #E Asian pop size for those lineages that didn't move to 'Melanesian' pop 1
     
-    feat_pop_merge(time=2002/40000, pop_source=2,pop_target=1) +                #Merge pop 2 into 1 at 2000 gens
-    feat_size_change((10500/10000), 1, time = 2002/40000) +                #ancestral pop. size at 2002 gens
+    feat_pop_merge(time=2000/40000, pop_source=2,pop_target=1) +                #Merge pop 2 into 1 at 2000 gens
+    feat_size_change((10500/10000) * 0.75, 1, time = 2000.001/40000) +                #ancestral pop. size at 2000 gens
 
     sumstat_seg_sites(name = "freq_inland", transformation = inland_segsites_freq) +
     sumstat_seg_sites(name = "freq_coastal", transformation = coastal_segsites_freq)
@@ -172,7 +172,7 @@ res_model2=apply(X=population_size, FUN = create_model2, MARGIN=1)
 
 ```{r}
 # Here, sites are filtered based on findings of Satyagraha et al. 2015
-# to those with inland_freq > 0.02 & < 0.05, coastal allele frequencies
+# to those with inland_freq >= 0.033 & <= 0.043 (ie around 0.038; bounds as for empirical analysis), coastal allele frequencies
 # for these sites are stored, and the 95th percentile is calculated.
 
 percentile_95_coastal_filtered <- numeric(length(res_model1))
@@ -190,8 +190,8 @@ for (run_idx in seq_along(res_model1)) {
     inland_locus <- inland_freq[[i]]
     coastal_locus <- coastal_freq[[i]]
     
-    # Filter inland frequencies to keep those between 2% and 5%
-    filter_indices <- which(inland_locus >= 0.02 & inland_locus <= 0.05)
+    # Filter inland frequencies to keep those between 3.3% and 4.3%
+    filter_indices <- which(inland_locus >= 0.033 & inland_locus <= 0.043)
     filtered_coastal_freq <- coastal_locus[filter_indices]
     filtered_coastal_freq_all <- c(filtered_coastal_freq_all, filtered_coastal_freq)
   }
@@ -211,11 +211,11 @@ res_model1_freq <- data.frame(size = population_size$Size,
 
 ```
 
-# 2.5% model
+# 5.5% model
 
 ```{r}
 # Here, sites are filtered based on findings of Satyagraha et al. 2015
-# to those with inland_freq > 0.02 & < 0.05, coastal allele frequencies
+# to those with inland_freq >= 0.033 & <= 0.043 (ie around 0.038; bounds as for empirical analysis), coastal allele frequencies
 # for these sites are stored, and the 95th percentile is calculated.
 
 percentile_95_coastal_filtered <- numeric(length(res_model2))
@@ -232,8 +232,8 @@ for (run_idx in seq_along(res_model2)) {
     inland_locus <- inland_freq[[i]]
     coastal_locus <- coastal_freq[[i]]
     
-    # Filter inland frequencies to keep those between 2% and 5%
-    filter_indices <- which(inland_locus >= 0.02 & inland_locus <= 0.05)
+    # Filter inland frequencies to keep those between 3.3% and 4.3%
+    filter_indices <- which(inland_locus >= 0.033 & inland_locus <= 0.043)
     filtered_coastal_freq <- coastal_locus[filter_indices]
     filtered_coastal_freq_all <- c(filtered_coastal_freq_all, filtered_coastal_freq)
   }
