@@ -327,8 +327,8 @@ for (run_idx in seq_along(res_model1)) {
     inland_locus <- inland_freq[[i]]
     coastal_locus <- coastal_freq[[i]]
     
-    # Filter inland frequencies to keep those between 2% and 5%
-    filter_indices <- which(inland_locus >= 0.02 & inland_locus <= 0.05)
+    # Filter inland frequencies to keep those between 3.3% and 4.8%
+    filter_indices <- which(inland_locus >= 0.033 & inland_locus <= 0.048)
     
     filtered_coastal_freq <- coastal_locus[filter_indices]
 
@@ -342,8 +342,8 @@ plt1 <- ggplot(data.frame(freq = filtered_coastal_freq_all), aes(x = freq)) +
   geom_histogram(binwidth = 0.01, fill = viridis(1, begin = 0.5, end = 0.5), color = NA) +
   labs(x = "Coastal derived allele frequency (migration rate 1.5%)",
        y = "SNP Count") +
-  geom_vline(xintercept = 0.15, linetype = "dashed", color = "red", size = 0.8) +
-  annotate("rect", xmin = 0.15, xmax = Inf, ymin = 0, ymax = Inf,
+  geom_vline(xintercept = 0.105, linetype = "dashed", color = "red", size = 0.8) +
+  annotate("rect", xmin = 0.105, xmax = Inf, ymin = 0, ymax = Inf,
            alpha = .1,fill = "red")+
   theme(
     panel.border = element_rect(color = "black", fill = NA, size = 1), 
@@ -370,8 +370,8 @@ for (run_idx in seq_along(res_model2)) {
     inland_locus <- inland_freq[[i]]
     coastal_locus <- coastal_freq[[i]]
     
-    # Filter inland frequencies to keep those between 2% and 5%
-    filter_indices <- which(inland_locus >= 0.02 & inland_locus <= 0.05)
+    # Filter inland frequencies to keep those between 3.3% and 4.8%
+    filter_indices <- which(inland_locus >= 0.033 & inland_locus <= 0.048)
     filtered_coastal_freq <- coastal_locus[filter_indices]
 
     filtered_coastal_freq_all <- c(filtered_coastal_freq_all, filtered_coastal_freq)
@@ -382,10 +382,10 @@ for (run_idx in seq_along(res_model2)) {
 
 plt2 <- ggplot(data.frame(freq = filtered_coastal_freq_all), aes(x = freq)) +
   geom_histogram(binwidth = 0.01, fill = viridis(1, begin = 0.5, end = 0.5), color = NA) + 
-  labs(x = "Coastal derived allele frequency (migration rate 2.5%)",
+  labs(x = "Coastal derived allele frequency (migration rate 5.5%)",
        y = "SNP Count") +
-  geom_vline(xintercept = 0.15, linetype = "dashed", color = "red", size = 0.8) +
-  annotate("rect", xmin = 0.15, xmax = Inf, ymin = 0, ymax = Inf,
+  geom_vline(xintercept = 0.105, linetype = "dashed", color = "red", size = 0.8) +
+  annotate("rect", xmin = 0.105, xmax = Inf, ymin = 0, ymax = Inf,
            alpha = .1,fill = "red")+
   theme(
     panel.border = element_rect(color = "black", fill = NA, size = 1), 
